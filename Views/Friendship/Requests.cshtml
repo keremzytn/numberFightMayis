@@ -1,0 +1,84 @@
+@model IEnumerable<numberFightMayis.Models.Friendship>
+@{
+    ViewData["Title"] = "Arkadaşlık İstekleri";
+}
+
+<div class="container">
+    <h2>Arkadaşlık İstekleri</h2>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Bekleyen İstekler
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var request in Model)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">@request.Requester.UserName</h5>
+                                        <small class="text-muted">@request.Requester.Email</small>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-success btn-sm accept-request" data-friendship-id="@request.Id">
+                                            Kabul Et
+                                        </button>
+                                        <button class="btn btn-danger btn-sm reject-request" data-friendship-id="@request.Id">
+                                            Reddet
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.accept-request', function () {
+                const friendshipId = $(this).data('friendship-id');
+                const item = $(this).closest('.list-group-item');
+
+                $.post('/Friendship/AcceptRequest', { friendshipId: friendshipId }, function () {
+                    item.fadeOut(function () {
+                        $(this).remove();
+                        if ($('.list-group-item').length === 0) {
+                            $('.card-body').html('<p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>');
+                        }
+                    });
+                }).fail(function () {
+                    alert('Bir hata oluştu.');
+                });
+            });
+
+            $(document).on('click', '.reject-request', function () {
+                const friendshipId = $(this).data('friendship-id');
+                const item = $(this).closest('.list-group-item');
+
+                $.post('/Friendship/RejectRequest', { friendshipId: friendshipId }, function () {
+                    item.fadeOut(function () {
+                        $(this).remove();
+                        if ($('.list-group-item').length === 0) {
+                            $('.card-body').html('<p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>');
+                        }
+                    });
+                }).fail(function () {
+                    alert('Bir hata oluştu.');
+                });
+            });
+        });
+    </script>
+} 

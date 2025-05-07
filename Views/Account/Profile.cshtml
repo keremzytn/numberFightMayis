@@ -1,0 +1,62 @@
+@model numberFightMayis.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Profil";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["Success"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            <div class="card">
+                <div class="card-header">
+                    <h2>Profil Bilgileri</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateUsername" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Kullanıcı Adı:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="newUsername" value="@Model.UserName" required />
+                                    <button type="submit" class="btn btn-primary">Değiştir</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>E-posta:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @Model.Email
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Gold:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge bg-warning text-dark">@Model.Gold Gold</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

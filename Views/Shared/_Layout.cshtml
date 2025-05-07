@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Number Fight</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/numberFightMayis.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --background-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+        }
+
+        .navbar {
+            background: linear-gradient(to right, #ffffff, #f8f9fa) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--secondary-color) !important;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem !important;
+            border-radius: 5px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+            color: var(--primary-color) !important;
+        }
+
+        .btn-outline-success {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-success:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .footer {
+            background: linear-gradient(to right, #ffffff, #f8f9fa);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .social-links a {
+            color: var(--secondary-color);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .social-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        #userGold {
+            font-weight: 600;
+            color: #f1c40f;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="" asp-action="Index">
+                    <i class="fas fa-gamepad me-2"></i>Number Fight
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="" asp-action="">
+                                <i class="fas fa-play me-1"></i>Oyun
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user me-1"></i>Profil
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                                            <i class="fas fa-user-circle me-1"></i>Profilim
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Friendship" asp-action="Index">
+                                            <i class="fas fa-users me-1"></i>Arkadaşlarım
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Friendship" asp-action="Requests">
+                                            <i class="fas fa-user-plus me-1"></i>Arkadaşlık İstekleri
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <span class="nav-link">
+                                    <i class="fas fa-coins me-1"></i><span id="userGold">@(ViewData["UserGold"] ?? 0)</span> Gold
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <button id="claimDailyReward" class="btn btn-outline-success nav-link">
+                                    <i class="fas fa-gift me-1"></i>Günlük Ödül
+                                </button>
+                            </li>
+                            @* <li class="nav-item">
+                                <span class="nav-link">
+                                    <i class="fas fa-smile me-1"></i>Merhaba, @User.Identity.Name!
+                                </span>
+                            </li> *@
+                            <li class="nav-item">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn btn-link nav-link">
+                                        <i class="fas fa-sign-out-alt me-1"></i>Çıkış Yap
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i>Kayıt Ol
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    &copy; @DateTime.Now.Year - Number Fight
+                </div>
+                <div class="social-links">
+                    <a href="#" class="me-3"><i class="fab fa-github"></i></a>
+                    <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function() {
+            $("#claimDailyReward").click(function() {
+                $.post("/DailyReward/ClaimDailyReward", function(response) {
+                    if (response.success) {
+                        // Gold miktarını güncelle
+                        var currentGold = parseInt($("#userGold").text());
+                        $("#userGold").text(currentGold + 100);
+                        
+                        // Başarılı mesajı göster
+                        alert(response.message);
+                    } else {
+                        // Hata mesajı göster
+                        alert(response.message);
+                    }
+                });
+            });
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

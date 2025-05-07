@@ -1,0 +1,142 @@
+@model IEnumerable<numberFightMayis.Models.Friendship>
+@{
+    ViewData["Title"] = "Arkadaşlarım";
+}
+
+<div class="container">
+    <h2>Arkadaşlarım</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Kullanıcı ara...">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" id="searchButton">Ara</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="searchResults" class="row mb-4" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Arama Sonuçları
+                </div>
+                <div class="card-body">
+                    <div id="userList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Arkadaş Listesi
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <p class="text-muted">Henüz arkadaşınız yok.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var friendship in Model)
+                            {
+                                var friend = friendship.RequesterId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                                    ? friendship.Addressee
+                                    : friendship.Requester;
+
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">@friend.UserName</h5>
+                                        <small class="text-muted">@friend.Email</small>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm remove-friend" data-friendship-id="@friendship.Id">
+                                        Arkadaşlıktan Çıkar
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let searchTimeout;
+
+            $('#searchInput').on('input', function () {
+                clearTimeout(searchTimeout);
+                const query = $(this).val();
+
+                if (query.length < 2) {
+                    $('#searchResults').hide();
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    $.get('/Friendship/Search', { query: query }, function (data) {
+                        const userList = $('#userList');
+                        userList.empty();
+
+                        if (data.users.length === 0) {
+                            userList.append('<p class="text-muted">Kullanıcı bulunamadı.</p>');
+                        } else {
+                            data.users.forEach(user => {
+                                userList.append(`
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h6 class="mb-0">${user.userName}</h6>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm send-request" data-user-id="${user.id}">
+                                            Arkadaşlık İsteği Gönder
+                                        </button>
+                                    </div>
+                                `);
+                            });
+                        }
+
+                        $('#searchResults').show();
+                    });
+                }, 300);
+            });
+
+            $(document).on('click', '.send-request', function () {
+                const userId = $(this).data('user-id');
+                const button = $(this);
+
+                $.post('/Friendship/SendRequest', { userId: userId }, function () {
+                    button.prop('disabled', true).text('İstek Gönderildi');
+                }).fail(function (xhr) {
+                    alert(xhr.responseText || 'Bir hata oluştu.');
+                });
+            });
+
+            $(document).on('click', '.remove-friend', function () {
+                const friendshipId = $(this).data('friendship-id');
+                const item = $(this).closest('.list-group-item');
+
+                if (confirm('Bu arkadaşı listeden çıkarmak istediğinizden emin misiniz?')) {
+                    $.post('/Friendship/RemoveFriend', { friendshipId: friendshipId }, function () {
+                        item.fadeOut(function () {
+                            $(this).remove();
+                            if ($('.list-group-item').length === 0) {
+                                $('.card-body').html('<p class="text-muted">Henüz arkadaşınız yok.</p>');
+                            }
+                        });
+                    }).fail(function () {
+                        alert('Bir hata oluştu.');
+                    });
+                }
+            });
+        });
+    </script>
+} 
