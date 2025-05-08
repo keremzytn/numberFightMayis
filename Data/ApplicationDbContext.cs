@@ -12,7 +12,6 @@ namespace numberFightMayis.Data
         }
 
         public DbSet<Friendship> Friendships { get; set; }
-        public DbSet<Game> Games { get; set; }
         public DbSet<DailyReward> DailyRewards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

@@ -10,7 +10,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Add Services
-builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<DailyRewardService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
