@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace numberFightMayis.Models
 {
@@ -8,5 +9,7 @@ namespace numberFightMayis.Models
         public string UserId { get; set; }
         public DateTime ClaimDate { get; set; }
         public int Amount { get; set; }
+
+        public virtual ApplicationUser User { get; set; }
     }
 } 

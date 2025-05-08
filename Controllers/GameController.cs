@@ -4,6 +4,7 @@ using numberFightMayis.Models;
 using numberFightMayis.Services;
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace numberFightMayis.Controllers
 {
@@ -19,22 +20,17 @@ namespace numberFightMayis.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Start()
         {
-            if (_currentGame == null || _currentGame.IsGameOver)
+            return View();
+        }
+
+        public IActionResult Index()
+        {
+            if (_currentGame == null)
             {
                 _currentGame = _gameService.CreateNewGame();
             }
-
-            if (User.Identity.IsAuthenticated)
-            {
-                var user = await _userManager.GetUserAsync(User);
-                if (user != null)
-                {
-                    ViewData["UserGold"] = user.Gold;
-                }
-            }
-
             return View(_currentGame);
         }
 

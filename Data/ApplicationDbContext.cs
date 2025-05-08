@@ -11,8 +11,9 @@ namespace numberFightMayis.Data
         {
         }
 
-        public DbSet<DailyReward> DailyRewards { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<Game> Games { get; set; }
+        public DbSet<DailyReward> DailyRewards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -20,13 +21,13 @@ namespace numberFightMayis.Data
 
             builder.Entity<Friendship>()
                 .HasOne(f => f.Requester)
-                .WithMany(u => u.SentFriendRequests)
+                .WithMany()
                 .HasForeignKey(f => f.RequesterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Friendship>()
                 .HasOne(f => f.Addressee)
-                .WithMany(u => u.ReceivedFriendRequests)
+                .WithMany()
                 .HasForeignKey(f => f.AddresseeId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

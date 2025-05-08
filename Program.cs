@@ -9,9 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add GameService
+// Add Services
 builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<DailyRewardService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -52,6 +53,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Game}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

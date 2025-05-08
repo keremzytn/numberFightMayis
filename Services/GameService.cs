@@ -4,16 +4,21 @@ using System.Linq;
 using numberFightMayis.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using numberFightMayis.Data;
 
 namespace numberFightMayis.Services
 {
     public class GameService
     {
-        private readonly Random _random = new Random();
+        private readonly ApplicationDbContext _context;
+        private readonly Random _random;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public GameService(UserManager<ApplicationUser> userManager)
+        public GameService(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
+            _context = context;
+            _random = new Random();
             _userManager = userManager;
         }
 
@@ -24,8 +29,74 @@ namespace numberFightMayis.Services
                 Player1Score = 0,
                 Player2Score = 0,
                 CurrentRound = 1,
-                GameStartTime = DateTime.Now,
-                IsGameOver = false
+                Status = GameStatus.WaitingForPlayer1,
+                CreatedAt = DateTime.UtcNow,
+                IsGameOver = false,
+                Player1UsedCards = new List<int>(),
+                Player2UsedCards = new List<int>()
+            };
+        }
+
+        public async Task<Game> GetGame(string gameId)
+        {
+            return await _context.Games
+                .FirstOrDefaultAsync(g => g.Id == gameId);
+        }
+
+        public async Task<GameResult> MakeMove(string gameId, string userId, int number)
+        {
+            var game = await GetGame(gameId);
+            if (game == null)
+                return new GameResult { Success = false, Message = "Oyun bulunamadı." };
+
+            if (game.Status != GameStatus.InProgress)
+                return new GameResult { Success = false, Message = "Oyun devam etmiyor." };
+
+            if (game.Player1Id != userId && game.Player2Id != userId)
+                return new GameResult { Success = false, Message = "Bu oyunda sıra sizde değil." };
+
+            var isPlayer1 = game.Player1Id == userId;
+            var currentRound = game.Rounds.Count + 1;
+
+            if (currentRound > 7)
+                return new GameResult { Success = false, Message = "Oyun bitti." };
+
+            var round = new GameRound
+            {
+                GameId = game.Id,
+                Player1Number = isPlayer1 ? number : null,
+                Player2Number = !isPlayer1 ? number : null,
+                RoundNumber = currentRound
+            };
+
+            game.Rounds.Add(round);
+
+            if (round.Player1Number.HasValue && round.Player2Number.HasValue)
+            {
+                round.Winner = round.Player1Number > round.Player2Number ? game.Player1Id :
+                              round.Player2Number > round.Player1Number ? game.Player2Id : null;
+
+                if (round.Winner != null)
+                {
+                    game.Player1Score += round.Winner == game.Player1Id ? 1 : 0;
+                    game.Player2Score += round.Winner == game.Player2Id ? 1 : 0;
+                }
+
+                if (currentRound == 7)
+                {
+                    game.Status = GameStatus.Finished;
+                    game.Winner = game.Player1Score > game.Player2Score ? game.Player1Id :
+                                game.Player2Score > game.Player1Score ? game.Player2Id : null;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new GameResult
+            {
+                Success = true,
+                Game = game,
+                Message = "Hamle başarıyla yapıldı."
             };
         }
 
@@ -164,5 +235,50 @@ namespace numberFightMayis.Services
 
             return (true, "Raund başarıyla tamamlandı.");
         }
+
+        public async Task<Game> CreateComputerGame(string userId)
+        {
+            var game = CreateNewGame();
+            game.Player1Id = userId;
+            game.Player2Id = "COMPUTER";
+            game.Status = GameStatus.InProgress;
+            
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+            
+            return game;
+        }
+
+        public async Task<Game> FindOrCreateRandomGame(string userId)
+        {
+            // Bekleyen bir oyun var mı kontrol et
+            var waitingGame = await _context.Games
+                .FirstOrDefaultAsync(g => g.Status == GameStatus.WaitingForPlayer1 && g.Player1Id != userId);
+
+            if (waitingGame != null)
+            {
+                waitingGame.Player2Id = userId;
+                waitingGame.Status = GameStatus.InProgress;
+                await _context.SaveChangesAsync();
+                return waitingGame;
+            }
+
+            // Yeni oyun oluştur
+            var game = CreateNewGame();
+            game.Player1Id = userId;
+            game.Status = GameStatus.WaitingForPlayer1;
+            
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+            
+            return game;
+        }
+    }
+
+    public class GameResult
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public Game Game { get; set; }
     }
 } 

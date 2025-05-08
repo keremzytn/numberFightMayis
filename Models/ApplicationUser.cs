@@ -14,7 +14,7 @@ namespace numberFightMayis.Models
         public int Losses { get; set; }
         public int Draws { get; set; }
 
-        public ICollection<Friendship> SentFriendRequests { get; set; }
-        public ICollection<Friendship> ReceivedFriendRequests { get; set; }
+        public ICollection<Friendship> SentFriendRequests { get; set; } = new List<Friendship>();
+        public ICollection<Friendship> ReceivedFriendRequests { get; set; } = new List<Friendship>();
     }
 }
