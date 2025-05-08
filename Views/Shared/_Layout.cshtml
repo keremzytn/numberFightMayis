@@ -214,6 +214,82 @@
             });
         });
     </script>
+    @section Scripts {
+        <script>
+            $(document).ready(function() {
+                let searchTimeout;
+                
+                $("#friendSearch").on("input", function() {
+                    clearTimeout(searchTimeout);
+                    const query = $(this).val();
+                    
+                    if (query.length < 2) {
+                        $("#searchResults").hide();
+                        return;
+                    }
+                    
+                    searchTimeout = setTimeout(() => {
+                        $.get("/Friendship/Search", { query: query }, function(data) {
+                            const results = $("#searchResults");
+                            results.empty();
+                            
+                            if (data.users.length === 0) {
+                                results.append('<div class="p-2 text-muted">Kullanıcı bulunamadı.</div>');
+                            } else {
+                                data.users.forEach(user => {
+                                    results.append(`
+                                        <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                            <div>
+                                                <strong>${user.userName}</strong>
+                                            </div>
+                                            <button class="btn btn-sm btn-primary send-request" data-user-id="${user.id}">
+                                                Arkadaş Ekle
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            }
+                            
+                            results.show();
+                        });
+                    }, 300);
+                });
+                
+                $(document).on("click", ".send-request", function() {
+                    const userId = $(this).data("user-id");
+                    const button = $(this);
+                    
+                    $.post("/Friendship/SendRequest", { userId: userId }, function() {
+                        button.prop("disabled", true).text("İstek Gönderildi");
+                    }).fail(function(xhr) {
+                        alert(xhr.responseText || "Bir hata oluştu.");
+                    });
+                });
+                
+                // Arama sonuçlarını dışarı tıklandığında gizle
+                $(document).on("click", function(e) {
+                    if (!$(e.target).closest("#friendSearch, #searchResults").length) {
+                        $("#searchResults").hide();
+                    }
+                });
+
+                // Bekleyen dostluk maçı isteklerini kontrol et
+                function checkPendingFriendMatchRequests() {
+                    $.get("/Friendship/GetPendingRequestCount", function(response) {
+                        if (response.count > 0) {
+                            $("#friendMatchRequestCount").text(response.count).show();
+                        } else {
+                            $("#friendMatchRequestCount").hide();
+                        }
+                    });
+                }
+
+                // Sayfa yüklendiğinde ve her 30 saniyede bir kontrol et
+                checkPendingFriendMatchRequests();
+                setInterval(checkPendingFriendMatchRequests, 30000);
+            });
+        </script>
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

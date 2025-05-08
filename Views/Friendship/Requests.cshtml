@@ -1,44 +1,53 @@
-@model IEnumerable<numberFightMayis.Models.Friendship>
+@model List<numberFightMayis.Models.Friendship>
+
 @{
     ViewData["Title"] = "Arkadaşlık İstekleri";
 }
 
 <div class="container">
-    <h2>Arkadaşlık İstekleri</h2>
-
     <div class="row">
-        <div class="col-12">
+        <div class="col-md-8 offset-md-2">
             <div class="card">
                 <div class="card-header">
-                    Bekleyen İstekler
+                    <h3>Arkadaşlık İstekleri</h3>
                 </div>
                 <div class="card-body">
                     @if (!Model.Any())
                     {
-                        <p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>
+                        <div class="alert alert-info">
+                            Bekleyen arkadaşlık isteğiniz bulunmamaktadır.
+                        </div>
                     }
                     else
                     {
                         <div class="list-group">
                             @foreach (var request in Model)
                             {
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h5 class="mb-1">@request.Requester.UserName</h5>
-                                        <small class="text-muted">@request.Requester.Email</small>
-                                    </div>
-                                    <div>
-                                        <button class="btn btn-success btn-sm accept-request" data-friendship-id="@request.Id">
-                                            Kabul Et
-                                        </button>
-                                        <button class="btn btn-danger btn-sm reject-request" data-friendship-id="@request.Id">
-                                            Reddet
-                                        </button>
+                                <div class="list-group-item">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@request.Requester.ProfileImageUrl" alt="@request.Requester.UserName" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                                        <div class="flex-grow-1">
+                                            <h5 class="mb-1">@request.Requester.UserName</h5>
+                                            <small class="text-muted">@request.CreatedAt.ToString("dd.MM.yyyy HH:mm")</small>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-success btn-sm accept-request" data-friendship-id="@request.Id">
+                                                <i class="fas fa-check me-1"></i>Kabul Et
+                                            </button>
+                                            <button class="btn btn-danger btn-sm reject-request" data-friendship-id="@request.Id">
+                                                <i class="fas fa-times me-1"></i>Reddet
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             }
                         </div>
                     }
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Arkadaş Listesine Dön
+                    </a>
                 </div>
             </div>
         </div>
@@ -47,36 +56,36 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $(document).on('click', '.accept-request', function () {
-                const friendshipId = $(this).data('friendship-id');
-                const item = $(this).closest('.list-group-item');
-
-                $.post('/Friendship/AcceptRequest', { friendshipId: friendshipId }, function () {
-                    item.fadeOut(function () {
+        $(document).ready(function() {
+            $(".accept-request").click(function() {
+                const friendshipId = $(this).data("friendship-id");
+                const item = $(this).closest(".list-group-item");
+                
+                $.post("/Friendship/AcceptRequest", { friendshipId: friendshipId }, function() {
+                    item.fadeOut(function() {
                         $(this).remove();
-                        if ($('.list-group-item').length === 0) {
-                            $('.card-body').html('<p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>');
+                        if ($(".list-group-item").length === 0) {
+                            $(".card-body").html('<div class="alert alert-info">Bekleyen arkadaşlık isteğiniz bulunmamaktadır.</div>');
                         }
                     });
-                }).fail(function () {
-                    alert('Bir hata oluştu.');
+                }).fail(function() {
+                    alert("Bir hata oluştu.");
                 });
             });
-
-            $(document).on('click', '.reject-request', function () {
-                const friendshipId = $(this).data('friendship-id');
-                const item = $(this).closest('.list-group-item');
-
-                $.post('/Friendship/RejectRequest', { friendshipId: friendshipId }, function () {
-                    item.fadeOut(function () {
+            
+            $(".reject-request").click(function() {
+                const friendshipId = $(this).data("friendship-id");
+                const item = $(this).closest(".list-group-item");
+                
+                $.post("/Friendship/RejectRequest", { friendshipId: friendshipId }, function() {
+                    item.fadeOut(function() {
                         $(this).remove();
-                        if ($('.list-group-item').length === 0) {
-                            $('.card-body').html('<p class="text-muted">Bekleyen arkadaşlık isteğiniz yok.</p>');
+                        if ($(".list-group-item").length === 0) {
+                            $(".card-body").html('<div class="alert alert-info">Bekleyen arkadaşlık isteğiniz bulunmamaktadır.</div>');
                         }
                     });
-                }).fail(function () {
-                    alert('Bir hata oluştu.');
+                }).fail(function() {
+                    alert("Bir hata oluştu.");
                 });
             });
         });

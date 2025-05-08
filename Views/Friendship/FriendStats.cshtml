@@ -1,0 +1,70 @@
+@model numberFightMayis.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = $"{Model.UserName} - İstatistikler";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex align-items-center">
+                        <img src="@Model.ProfileImageUrl" alt="@Model.UserName" class="rounded-circle me-3" style="width: 64px; height: 64px; object-fit: cover;">
+                        <h3 class="mb-0">@Model.UserName - Detaylı İstatistikler</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Oyun İstatistikleri</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Toplam Oyun</th>
+                                    <td>@Model.TotalGames</td>
+                                </tr>
+                                <tr>
+                                    <th>Galibiyet</th>
+                                    <td>@Model.Wins</td>
+                                </tr>
+                                <tr>
+                                    <th>Mağlubiyet</th>
+                                    <td>@Model.Losses</td>
+                                </tr>
+                                <tr>
+                                    <th>Beraberlik</th>
+                                    <td>@Model.Draws</td>
+                                </tr>
+                                <tr>
+                                    <th>Galibiyet Oranı</th>
+                                    <td>
+                                        @{
+                                            var winRate = Model.TotalGames > 0 
+                                                ? (double)Model.Wins / Model.TotalGames * 100 
+                                                : 0;
+                                        }
+                                        %@winRate.ToString("F1")
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Ekonomi</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Mevcut Altın</th>
+                                    <td>@Model.Gold</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Arkadaş Listesine Dön
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

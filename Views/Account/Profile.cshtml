@@ -21,40 +21,133 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
+
             <div class="card">
                 <div class="card-header">
                     <h2>Profil Bilgileri</h2>
                 </div>
                 <div class="card-body">
-                    <form asp-action="UpdateUsername" method="post">
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <strong>Kullanıcı Adı:</strong>
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center">
+                            <img src="@Model.ProfileImageUrl" alt="Profil Resmi" class="img-fluid rounded-circle" style="max-width: 200px; height: auto;">
+                            <form asp-action="UpdateProfileImage" method="post" enctype="multipart/form-data" class="mt-3">
+                                <div class="mb-3">
+                                    <input type="file" class="form-control" name="profileImage" accept=".jpg,.jpeg,.png,.webp" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Profil Resmini Güncelle</button>
+                            </form>
+                        </div>
+                        <div class="col-md-8">
+                            <form asp-action="UpdateUsername" method="post">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Kullanıcı Adı:</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="newUsername" value="@Model.UserName" required />
+                                            <button type="submit" class="btn btn-primary">Değiştir</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>E-posta:</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    @Model.Email
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" name="newUsername" value="@Model.UserName" required />
-                                    <button type="submit" class="btn btn-primary">Değiştir</button>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <strong>Gold:</strong>
+                                </div>
+                                <div class="col-md-8">
+                                    <span class="badge bg-warning text-dark">@Model.Gold Gold</span>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>Oyun İstatistikleri</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Toplam Oyun:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            @Model.TotalGames
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Galibiyet:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge bg-success">@Model.Wins</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Mağlubiyet:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge bg-danger">@Model.Losses</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Beraberlik:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge bg-info">@Model.Draws</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2>Şifre Değiştir</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="ChangePassword" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Mevcut Şifre:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" name="currentPassword" required />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Yeni Şifre:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" name="newPassword" required />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Yeni Şifre (Tekrar):</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" name="confirmPassword" required />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 offset-md-4">
+                                <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
+                            </div>
+                        </div>
                     </form>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <strong>E-posta:</strong>
-                        </div>
-                        <div class="col-md-8">
-                            @Model.Email
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <strong>Gold:</strong>
-                        </div>
-                        <div class="col-md-8">
-                            <span class="badge bg-warning text-dark">@Model.Gold Gold</span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

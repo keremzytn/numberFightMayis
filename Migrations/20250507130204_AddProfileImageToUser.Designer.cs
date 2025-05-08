@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using numberFightMayis.Data;
 
@@ -10,9 +11,11 @@ using numberFightMayis.Data;
 namespace numberFightMayis.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250507130204_AddProfileImageToUser")]
+    partial class AddProfileImageToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -197,6 +200,7 @@ namespace numberFightMayis.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ProfileImageUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
@@ -246,41 +250,6 @@ namespace numberFightMayis.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DailyRewards");
-                });
-
-            modelBuilder.Entity("numberFightMayis.Models.FriendMatchRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsRejected")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("RequestDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ResponseDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("FriendMatchRequests");
                 });
 
             modelBuilder.Entity("numberFightMayis.Models.Friendship", b =>
@@ -363,25 +332,6 @@ namespace numberFightMayis.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("numberFightMayis.Models.FriendMatchRequest", b =>
-                {
-                    b.HasOne("numberFightMayis.Models.ApplicationUser", "Receiver")
-                        .WithMany("ReceivedMatchRequests")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("numberFightMayis.Models.ApplicationUser", "Sender")
-                        .WithMany("SentMatchRequests")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("numberFightMayis.Models.Friendship", b =>
                 {
                     b.HasOne("numberFightMayis.Models.ApplicationUser", "Addressee")
@@ -405,11 +355,7 @@ namespace numberFightMayis.Migrations
                 {
                     b.Navigation("ReceivedFriendRequests");
 
-                    b.Navigation("ReceivedMatchRequests");
-
                     b.Navigation("SentFriendRequests");
-
-                    b.Navigation("SentMatchRequests");
                 });
 #pragma warning restore 612, 618
         }

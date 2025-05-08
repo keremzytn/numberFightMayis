@@ -1,0 +1,84 @@
+@model List<numberFightMayis.Models.FriendMatchRequest>
+
+@{
+    ViewData["Title"] = "Bekleyen Dostluk Maçı İstekleri";
+}
+
+<div class="container">
+    <h2 class="mb-4">Bekleyen Dostluk Maçı İstekleri</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Bekleyen dostluk maçı isteğiniz bulunmamaktadır.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var request in Model)
+            {
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="@request.Sender.ProfileImageUrl" alt="@request.Sender.UserName" 
+                                     class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                <div>
+                                    <h5 class="card-title mb-0">@request.Sender.UserName</h5>
+                                    <small class="text-muted">@request.RequestDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-success me-2 accept-request" data-request-id="@request.Id">
+                                    <i class="fas fa-check me-1"></i>Kabul Et
+                                </button>
+                                <button class="btn btn-danger reject-request" data-request-id="@request.Id">
+                                    <i class="fas fa-times me-1"></i>Reddet
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $(".accept-request").click(function() {
+                const requestId = $(this).data("request-id");
+                const button = $(this);
+                
+                $.post("/Friendship/AcceptFriendMatchRequest", { requestId: requestId }, function(response) {
+                    if (response.success) {
+                        if (response.redirectUrl) {
+                            window.location.href = response.redirectUrl;
+                        }
+                    } else {
+                        alert(response.message || "İstek kabul edilirken bir hata oluştu.");
+                    }
+                }).fail(function() {
+                    alert("İstek kabul edilirken bir hata oluştu.");
+                });
+            });
+            
+            $(".reject-request").click(function() {
+                const requestId = $(this).data("request-id");
+                const button = $(this);
+                
+                $.post("/Friendship/RejectFriendMatchRequest", { requestId: requestId }, function(response) {
+                    if (response.success) {
+                        button.closest(".col-md-6").fadeOut();
+                    } else {
+                        alert(response.message || "İstek reddedilirken bir hata oluştu.");
+                    }
+                }).fail(function() {
+                    alert("İstek reddedilirken bir hata oluştu.");
+                });
+            });
+        });
+    </script>
+} 

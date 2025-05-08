@@ -95,6 +95,19 @@ namespace numberFightMayis.Services
             return availableCards[_random.Next(availableCards.Count)];
         }
 
+        private async Task UpdateUserStats(ApplicationUser user, bool isWin, bool isDraw)
+        {
+            user.TotalGames++;
+            if (isWin)
+                user.Wins++;
+            else if (isDraw)
+                user.Draws++;
+            else
+                user.Losses++;
+
+            await _userManager.UpdateAsync(user);
+        }
+
         public async Task<(bool isValid, string message)> PlayRound(Game game, int player1Card, int player2Card, string playerId)
         {
             if (game.IsGameOver)
@@ -127,21 +140,26 @@ namespace numberFightMayis.Services
             if (game.CurrentRound > 7)
             {
                 game.IsGameOver = true;
-                if (game.Player1Score > game.Player2Score)
+                var user = await _userManager.FindByIdAsync(playerId);
+                if (user != null)
                 {
-                    game.Winner = "Oyuncu 1";
-                    // Oyuncu kazandığında 100 gold ekle
-                    var user = await _userManager.FindByIdAsync(playerId);
-                    if (user != null)
+                    if (game.Player1Score > game.Player2Score)
                     {
+                        game.Winner = "Oyuncu 1";
                         user.Gold += 100;
-                        await _userManager.UpdateAsync(user);
+                        await UpdateUserStats(user, true, false);
+                    }
+                    else if (game.Player2Score > game.Player1Score)
+                    {
+                        game.Winner = "Bilgisayar";
+                        await UpdateUserStats(user, false, false);
+                    }
+                    else
+                    {
+                        game.Winner = "Berabere";
+                        await UpdateUserStats(user, false, true);
                     }
                 }
-                else if (game.Player2Score > game.Player1Score)
-                    game.Winner = "Bilgisayar";
-                else
-                    game.Winner = "Berabere";
             }
 
             return (true, "Raund başarıyla tamamlandı.");
