@@ -46,7 +46,31 @@
                                     <div class="col-md-8">
                                         <div class="input-group">
                                             <input type="text" class="form-control" name="newUsername" value="@Model.UserName" required />
-                                            <button type="submit" class="btn btn-primary">Değiştir</button>
+                                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <form asp-action="UpdatePersonalInfo" method="post" class="mt-3">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Ad:</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="firstName" value="@Model.FirstName" />
+                                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <strong>Soyad:</strong>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="lastName" value="@Model.LastName" />
+                                            <button type="submit" class="btn btn-primary">Güncelle</button>
                                         </div>
                                     </div>
                                 </div>

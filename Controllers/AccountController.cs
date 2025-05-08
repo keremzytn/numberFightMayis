@@ -36,7 +36,13 @@ namespace numberFightMayis.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser 
+                { 
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
@@ -166,6 +172,31 @@ namespace numberFightMayis.Controllers
             else
             {
                 TempData["Error"] = "Şifre değiştirilirken bir hata oluştu. Lütfen mevcut şifrenizi kontrol ediniz.";
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePersonalInfo(string firstName, string lastName)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            user.FirstName = firstName;
+            user.LastName = lastName;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                TempData["Success"] = "Kişisel bilgileriniz başarıyla güncellendi.";
+            }
+            else
+            {
+                TempData["Error"] = "Kişisel bilgiler güncellenirken bir hata oluştu.";
             }
 
             return RedirectToAction("Profile");

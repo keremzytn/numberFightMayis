@@ -13,11 +13,6 @@
                 <p>Rastgele bir oyuncuyla hemen oyuna başlayın</p>
                 <button class="btn btn-primary" onclick="startQuickGame()">Hızlı Oyun</button>
             </div>
-            <div class="option-card">
-                <h2>Arkadaşla Oyna</h2>
-                <p>Arkadaşınızla özel bir oyun başlatın</p>
-                <button class="btn btn-primary" onclick="startFriendGame()">Arkadaşla Oyna</button>
-            </div>
         </div>
     </div>
 </div>
@@ -27,11 +22,6 @@
         function startQuickGame() {
             // Hızlı oyun başlatma mantığı
             window.location.href = '/Game/Play?mode=quick';
-        }
-
-        function startFriendGame() {
-            // Arkadaşla oyun başlatma mantığı
-            window.location.href = '/Game/Play?mode=friend';
         }
     </script>
 } 

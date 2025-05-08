@@ -167,8 +167,14 @@ namespace numberFightMayis.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Gold")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
@@ -246,41 +252,6 @@ namespace numberFightMayis.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DailyRewards");
-                });
-
-            modelBuilder.Entity("numberFightMayis.Models.FriendMatchRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsRejected")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("RequestDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ResponseDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("FriendMatchRequests");
                 });
 
             modelBuilder.Entity("numberFightMayis.Models.Friendship", b =>
@@ -363,25 +334,6 @@ namespace numberFightMayis.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("numberFightMayis.Models.FriendMatchRequest", b =>
-                {
-                    b.HasOne("numberFightMayis.Models.ApplicationUser", "Receiver")
-                        .WithMany("ReceivedMatchRequests")
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("numberFightMayis.Models.ApplicationUser", "Sender")
-                        .WithMany("SentMatchRequests")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("numberFightMayis.Models.Friendship", b =>
                 {
                     b.HasOne("numberFightMayis.Models.ApplicationUser", "Addressee")
@@ -405,11 +357,7 @@ namespace numberFightMayis.Migrations
                 {
                     b.Navigation("ReceivedFriendRequests");
 
-                    b.Navigation("ReceivedMatchRequests");
-
                     b.Navigation("SentFriendRequests");
-
-                    b.Navigation("SentMatchRequests");
                 });
 #pragma warning restore 612, 618
         }

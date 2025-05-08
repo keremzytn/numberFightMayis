@@ -86,9 +86,6 @@
                             <a asp-action="FriendStats" asp-route-id="@friend.Id" class="btn btn-primary mt-3">
                                 <i class="fas fa-chart-bar me-1"></i>Detaylı İstatistikler
                             </a>
-                            <button class="btn btn-success mt-2 send-friend-match" data-user-id="@friend.Id">
-                                <i class="fas fa-gamepad me-1"></i>Dostluk Maçı
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -111,27 +108,29 @@
                     return;
                 }
                 
-                searchTimeout = setTimeout(function() {
-                    $.get("/Friendship/Search", { query: query }, function(response) {
-                        const results = response.users;
-                        if (results.length === 0) {
-                            $("#searchResultsBody").html('<tr><td colspan="2" class="text-center">Kullanıcı bulunamadı</td></tr>');
+                searchTimeout = setTimeout(() => {
+                    $.get("/Friendship/Search", { query: query }, function(data) {
+                        const results = $("#searchResults");
+                        results.empty();
+                        
+                        if (data.users.length === 0) {
+                            results.append('<div class="p-2 text-muted">Kullanıcı bulunamadı.</div>');
                         } else {
-                            const resultsHtml = results.map(user => `
-                                <tr>
-                                    <td>
-                                        <i class="fas fa-user me-2"></i>${user.userName}
-                                    </td>
-                                    <td>
+                            data.users.forEach(user => {
+                                results.append(`
+                                    <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                                        <div>
+                                            <strong>${user.userName}</strong>
+                                        </div>
                                         <button class="btn btn-sm btn-primary send-request" data-user-id="${user.id}">
-                                            <i class="fas fa-user-plus me-1"></i> Arkadaş Ekle
+                                            Arkadaş Ekle
                                         </button>
-                                    </td>
-                                </tr>
-                            `).join("");
-                            $("#searchResultsBody").html(resultsHtml);
+                                    </div>
+                                `);
+                            });
                         }
-                        $("#searchResults").show();
+                        
+                        results.show();
                     });
                 }, 300);
             });
@@ -141,48 +140,17 @@
                 const button = $(this);
                 
                 $.post("/Friendship/SendRequest", { userId: userId }, function() {
-                    button.prop("disabled", true)
-                        .html('<i class="fas fa-check me-1"></i> İstek Gönderildi')
-                        .removeClass('btn-primary')
-                        .addClass('btn-success');
-                }).fail(function() {
-                    alert("Arkadaşlık isteği gönderilirken bir hata oluştu.");
+                    button.prop("disabled", true).text("İstek Gönderildi");
+                }).fail(function(xhr) {
+                    alert(xhr.responseText || "Bir hata oluştu.");
                 });
             });
             
+            // Arama sonuçlarını dışarı tıklandığında gizle
             $(document).on("click", function(e) {
                 if (!$(e.target).closest("#friendSearch, #searchResults").length) {
                     $("#searchResults").hide();
                 }
-            });
-
-            $(document).on("click", ".send-friend-match", function() {
-                const userId = $(this).data("user-id");
-                const button = $(this);
-                
-                $.post("/Friendship/SendFriendMatchRequest", { userId: userId })
-                    .done(function(response) {
-                        if (response.success) {
-                            button.prop("disabled", true)
-                                .html('<i class="fas fa-clock me-1"></i> İstek Gönderildi')
-                                .removeClass('btn-success')
-                                .addClass('btn-secondary');
-                        } else {
-                            alert(response.message || "Dostluk maçı isteği gönderilirken bir hata oluştu.");
-                        }
-                    })
-                    .fail(function(xhr) {
-                        let errorMessage = "Dostluk maçı isteği gönderilirken bir hata oluştu.";
-                        try {
-                            const response = JSON.parse(xhr.responseText);
-                            if (response.message) {
-                                errorMessage = response.message;
-                            }
-                        } catch (e) {
-                            // JSON parse hatası durumunda varsayılan mesajı kullan
-                        }
-                        alert(errorMessage);
-                    });
             });
         });
     </script>
